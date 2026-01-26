@@ -1,0 +1,21 @@
+projgen/
+├── src/                      
+│   ├── __init__.py
+│   ├── cli.py                
+│   └── generator.py           
+│
+├── templates/                 
+│   └── backend/              
+│       ├── src/
+│       │   └── main.py.j2
+│       ├── tests/
+│       │   └── test_main.py.j2
+│       └── README.md.j2
+│
+├── tests/                     
+│   └── test_generator.py
+│
+├── pyproject.toml            
+├── setup.cfg                 
+├── README.md                  
+└── LICENSE

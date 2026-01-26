@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "projgen"
+version = "0.1.0"
+description = "A simple Python CLI tool to generate project templates."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name="Mohammed Amir ", email="your.email@example.com" }
+]
+license = { text = "MIT" }
+keywords = ["python", "project-generator", "boilerplate", "cli", "backend"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "black", "isort"]
+
+[project.scripts]
+projgen = "src.cli:main"
