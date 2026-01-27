@@ -1,0 +1,30 @@
+name: backend
+description: "Production-ready Python backend template"
+
+variables:
+  project_name:
+    type: string
+    required: true
+    description: "Project package name"
+
+features:
+  auth:
+    description: "JWT authentication"
+    path: optional/auth
+
+  logging:
+    description: "Structured logging with YAML config"
+    path: optional/logging
+
+  docker:
+    description: "Docker & docker-compose setup"
+    path: optional/docker
+
+  ci:
+    description: "GitHub Actions CI pipeline"
+    path: optional/ci
+
+structure:
+  - src/{{ project_name }}
+  - configs
+  - tests

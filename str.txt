@@ -1,21 +1,70 @@
 projgen/
-├── src/                      
-│   ├── __init__.py
-│   ├── cli.py                
-│   └── generator.py           
-│
-├── templates/                 
-│   └── backend/              
-│       ├── src/
-│       │   └── main.py.j2
-│       ├── tests/
-│       │   └── test_main.py.j2
-│       └── README.md.j2
-│
-├── tests/                     
-│   └── test_generator.py
-│
-├── pyproject.toml            
-├── setup.cfg                 
-├── README.md                  
-└── LICENSE
+ ├─ projgen/
+ │   ├─ cli.py
+ │   ├─ engine/
+ │   │   ├─ generator.py
+ │   │   ├─ context.py
+ │   │   └─ renderer.py
+ │   │
+ │   ├─ templates/
+ │   │   ├─ backend/
+ │   │   │   ├─ template.yaml
+ │   │   │   └─ files/
+ │   │   │       ├─ src/
+ │   │   │       │   └─ {{ project_name }}/
+ │   │   │       │       ├─ __init__.py
+ │   │   │       │       ├─ main.py.j2
+ │   │   │       │       ├─ api/
+ │   │   │       │       │   ├─ __init__.py
+ │   │   │       │       │   ├─ router.py.j2
+ │   │   │       │       │   └─ v1/
+ │   │   │       │       │       ├─ __init__.py
+ │   │   │       │       │       └─ endpoints/
+ │   │   │       │       ├─ core/
+ │   │   │       │       │   ├─ __init__.py
+ │   │   │       │       │   ├─ config.py.j2
+ │   │   │       │       │   └─ logging.py.j2
+ │   │   │       │       ├─ models/
+ │   │   │       │       ├─ schemas/
+ │   │   │       │       ├─ services/
+ │   │   │       │       └─ db/
+ │   │   │       │           ├─ __init__.py
+ │   │   │       │           └─ session.py.j2
+ │   │   │       │
+ │   │   │       ├─ tests/
+ │   │   │       │   └─ test_health.py.j2
+ │   │   │       │
+ │   │   │       ├─ configs/
+ │   │   │       │   ├─ settings.dev.yaml
+ │   │   │       │   └─ settings.prod.yaml
+ │   │   │       │
+ │   │   │       ├─ optional/
+ │   │   │       │   ├─ auth/
+ │   │   │       │   │   ├─ dependencies.py.j2
+ │   │   │       │   │   ├─ jwt.py.j2
+ │   │   │       │   │   └─ routes.py.j2
+ │   │   │       │   │
+ │   │   │       │   ├─ logging/
+ │   │   │       │   │   └─ logging.yaml
+ │   │   │       │   │
+ │   │   │       │   ├─ docker/
+ │   │   │       │   │   ├─ Dockerfile
+ │   │   │       │   │   └─ docker-compose.yml
+ │   │   │       │   │
+ │   │   │       │   └─ ci/
+ │   │   │       │       └─ github-actions.yml
+ │   │   │       │
+ │   │   │       ├─ requirements.txt
+ │   │   │       ├─ pyproject.toml
+ │   │   │       ├─ .env.example
+ │   │   │       └─ README.md.j2
+ │   │   │
+ │   │   ├─ frontend/
+ │   │   ├─ fullstack/
+ │   │   ├─ cli/
+ │   │   └─ library/
+ │   │
+ │   └─ utils/
+ │
+ ├─ tests/
+ └─ README.md

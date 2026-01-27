@@ -1,0 +1,18 @@
+from fastapi import FastAPI
+from {{ project_name }}.api.router import router as api_router
+from core.logging import setup_logging, get_logger
+
+
+
+app = FastAPI(title="{{ project_name }} API")
+
+app.include_router(api_router)
+
+setup_logging()
+logger = get_logger(__name__)
+
+logger.info("Application started")
+
+@app.get("/")
+def root():
+    return {"message": "Welcome to {{ project_name }}"}

@@ -1,0 +1,14 @@
+app:
+  name: {{ project_name }}
+  env: production
+  debug: false
+
+server:
+  host: 0.0.0.0
+  port: 8000
+
+database:
+  url: postgresql://user:password@localhost:5432/{{ project_name }}
+
+logging:
+  level: INFO
