@@ -8,10 +8,13 @@ It helps you bootstrap new projects in **one command** instead of manually creat
 ## Features
 
 - Generate Python project templates with a single command.
-- Supports multiple template types (e.g., `backend`, `frontend`, `api`).
+- Templates can be easily extended or customized.
+- Supports multiple template types (e.g., `backend`, `frontend`, `fullstack`, `library`).
 - Automatically creates proper package structure with `__init__.py`.
 - Includes example `main.py`, `tests/`, `requirements.txt`, and `README.md`.
+- Supports **optional modules** like `auth`, `docker`, `ci`, and `logging`.
 - Templates can be easily extended or customized.
+
 
 ---
 
@@ -42,17 +45,21 @@ pip install -e .
 
 ### Generate a new project from any template
 ```
-projgen <template_type> <project_name> --path "/path/to/projects"
+projgen <template_type> <project_name> [--path "/path/to/projects"] [--with auth,docker,logging]
+
 ```
 ### Example
 ```bash
-projgen backend my_backend_project --path "/path/to/projects"
+projgen backend my_backend_project --path "/path/to/projects" --with auth,logging
+
 ```
 
-### Arguments
+## Arguments
+
 
 **template_type**
-Type of project template to use (e.g. backend, frontend, api, or any custom template).
+Type of project template to use (e.g., backend, frontend, fullstack, library).
+
 
 **project_name**
 Name of the project to be generated.
@@ -61,26 +68,47 @@ Name of the project to be generated.
 Directory where the project will be created.
 Default: current directory.
 
+**--with (optional)**
+Comma-separated list of optional modules to include:
+auth, docker, ci, logging.
+
 ## Notes
 
-Available templates are defined inside the templates/ directory.
+- Available templates are defined inside the templates/ directory.
 
-You can add your own templates by creating a new folder under templates/.
+- You can add your own templates by creating a new folder under templates/.
+
+- The generator automatically renders Jinja2 templates and replaces {{ project_name }} in files and folders.
 
 ## Generated Structure Example
 For a backend template:
 
 ```
-Copy code
 my_backend_project/
 ├── src/
-│   ├── __init__.py
-│   └── main.py
+│   └── {{ project_name }}/
+│       ├── __init__.py
+│       ├── main.py
+│       ├── api/
+│       ├── core/
+│       ├── models/
+│       ├── schemas/
+│       ├── services/
+│       └── db/
 ├── tests/
-│   ├── __init__.py
-│   └── test_main.py
-├── README.md
-└── requirements.txt
+│   └── test_health.py
+├── configs/
+│   ├── settings.dev.yaml
+│   └── settings.prod.yaml
+├── optional/
+│   ├── auth/
+│   ├── docker/
+│   ├── logging/
+│   └── ci/
+├── requirements.txt
+├── pyproject.toml
+└── README.md
+
 ```
 
 ## Requirements
