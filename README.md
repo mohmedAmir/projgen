@@ -1,6 +1,6 @@
 # projgen
 
-**projgen** is a Python CLI tool to quickly generate project templates with a predefined structure.  
+**projgen** is a Python CLI tool to quickly generate Python project templates with a predefined structure.  
 It helps you bootstrap new projects in **one command** instead of manually creating folders and files every time.
 
 ---
@@ -8,13 +8,14 @@ It helps you bootstrap new projects in **one command** instead of manually creat
 ## Features
 
 - Generate Python project templates with a single command.
-- Templates can be easily extended or customized.
-- Supports multiple template types (e.g., `backend`, `frontend`, `fullstack`, `library`).
-- Automatically creates proper package structure with `__init__.py`.
+- Supports multiple template types: `backend`, `frontend`, `fullstack`, `library`.
+- Automatically creates proper package structure with `__init__.py` in your source folders.
 - Includes example `main.py`, `tests/`, `requirements.txt`, and `README.md`.
-- Supports **optional modules** like `auth`, `docker`, `ci`, and `logging`.
-- Templates can be easily extended or customized.
+- Supports **optional modules/features** like `auth`, `docker`, `ci`, and `logging`.
+- Features are **modular plugins**; you can add your own or extend existing ones.
+- Templates and features are rendered with Jinja2 and respect folder structure.
 
+---
 
 ---
 
@@ -45,12 +46,13 @@ pip install -e .
 
 ### Generate a new project from any template
 ```
-projgen <template_type> <project_name> [--path "/path/to/projects"] [--with auth,docker,logging]
+projgen new <project_name> --template <template_type> [--features auth,docker,ci,logging] [--path "/path/to/projects"]
+
 
 ```
 ### Example
 ```bash
-projgen backend my_backend_project --path "/path/to/projects" --with auth,logging
+ projgen new myapp --template backend --features auth --path "/path/to/projects"
 
 ```
 
@@ -60,51 +62,51 @@ projgen backend my_backend_project --path "/path/to/projects" --with auth,loggin
 **template_type**
 Type of project template to use (e.g., backend, frontend, fullstack, library).
 
-
 **project_name**
-Name of the project to be generated.
+Name of the project to generate.
 
-**--path (optional)**
-Directory where the project will be created.
-Default: current directory.
+**--template**
+Template type to use (backend, frontend, fullstack, library). Default: backend.
 
-**--with (optional)**
-Comma-separated list of optional modules to include:
-auth, docker, ci, logging.
+-**--path (optional)**
+Directory where the project will be created. Default: current directory.
+
+**--features (optional)**
+Comma-separated list of optional features/modules to include: auth, docker, ci, logging.
 
 ## Notes
 
-- Available templates are defined inside the templates/ directory.
+- Available templates are in the templates/ directory.
 
-- You can add your own templates by creating a new folder under templates/.
+- Features are inside features/ and automatically integrated into your project.
 
-- The generator automatically renders Jinja2 templates and replaces {{ project_name }} in files and folders.
+- Jinja2 templates automatically replace {{ project_name }} in files and folders.
 
+- The generator preserves folder structures from templates and features; it will not create unnecessary nested folders.
 ## Generated Structure Example
 For a backend template:
 
 ```
 my_backend_project/
-├── src/
-│   └── {{ project_name }}/
-│       ├── __init__.py
-│       ├── main.py
-│       ├── api/
-│       ├── core/
-│       ├── models/
-│       ├── schemas/
-│       ├── services/
-│       └── db/
+├── files/
+│   └── src/
+│       └── backend/
+│           ├── auth/          # if auth feature included
+│           │   ├── jwt.py
+│           │   └── routes.py
+│           ├── __init__.py
+│           ├── main.py
+│           ├── api/
+│           ├── core/
+│           ├── models/
+│           ├── schemas/
+│           ├── services/
+│           └── db/
 ├── tests/
 │   └── test_health.py
 ├── configs/
 │   ├── settings.dev.yaml
 │   └── settings.prod.yaml
-├── optional/
-│   ├── auth/
-│   ├── docker/
-│   ├── logging/
-│   └── ci/
 ├── requirements.txt
 ├── pyproject.toml
 └── README.md

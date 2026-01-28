@@ -1,74 +1,89 @@
-import os
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 import shutil
-
-# List of optional modules
-OPTIONAL_MODULES = ["auth", "docker", "ci", "logging"]
+import os
 
 
-class ProjectGenerator:
-    def __init__(self, project_name, output_dir=".", template_type="backend", options=None):
+class Renderer:
+    """
+    Renderer for project templates and feature adapters.
+    Uses Jinja2 to render files and copies non-template files.
+    Works with Context and FeaturePlugin system.
+    """
+
+    def __init__(self, template_dir: Path, output_dir: Path, project_name: str):
+        self.template_dir = template_dir
+        self.output_dir = output_dir
         self.project_name = project_name
-        self.output_dir = os.path.join(output_dir, project_name)
 
-
-        # template_dir points to project root -> templates/template_type
-        self.template_dir = os.path.join(
-            Path(__file__).resolve().parents[2],  # projgen root
-            "templates",
-            template_type
-        )
-        self.options = options or []
-
-        if not os.path.exists(self.template_dir):
-            raise FileNotFoundError(
-                f"Template '{template_type}' does not exist at {self.template_dir}!"
-            )
-
-        # Initialize Jinja2 environment
         self.env = Environment(
-            loader=FileSystemLoader(self.template_dir),
+            loader=FileSystemLoader(template_dir),
             keep_trailing_newline=True
         )
 
-    # Copy and render template files
-    def copy_and_render(self):
-        if os.path.exists(self.output_dir):
-            raise FileExistsError(f"Directory {self.output_dir} already exists!")
+    # ---------- render base template ----------
+    def render_template_dir(self, template_name: str):
+        if self.output_dir.exists():
+            raise FileExistsError(f"Directory {self.output_dir} already exists")
 
         for root, dirs, files in os.walk(self.template_dir):
-            rel_path = os.path.relpath(root, self.template_dir)
+            rel_path = Path(root).relative_to(self.template_dir)
+            # replace {{ project_name }} in path
+            target_dir = self.output_dir / str(rel_path).replace("{{ project_name }}", template_name)
+            target_dir.mkdir(parents=True, exist_ok=True)
 
-            # Skip optional modules not selected
-            if rel_path.startswith("optional"):
-                parts = rel_path.split(os.sep)
-                module_name = parts[1] if len(parts) > 1 else None
-                if module_name not in self.options:
-                    continue
+            for f in files:
+                src_file = Path(root) / f
+                # replace {{ project_name }} in filename
+                dest_file = target_dir / f.replace(".j2", "").replace("{{ project_name }}", template_name)
 
-            # Replace {{ project_name }} in directories
-            target_dir = os.path.join(self.output_dir, rel_path.replace("{{ project_name }}", self.project_name))
-            os.makedirs(target_dir, exist_ok=True)
-
-            for file_name in files:
-                src_file = os.path.join(root, file_name)
-                dest_file = os.path.join(target_dir, file_name.replace(".j2", ""))
-
-                # Render Jinja2 templates
-                if file_name.endswith(".j2"):
-                    template_path = file_name if rel_path == "." else str(Path(rel_path) / file_name).replace("\\", "/")
+                if f.endswith(".j2"):
+                    template_path = str(rel_path / f).replace("\\", "/")
                     template = self.env.get_template(template_path)
+                    # standard rendering with project_name
                     content = template.render(project_name=self.project_name)
-                    with open(dest_file, "w", encoding="utf-8") as f:
-                        f.write(content)
+                    with open(dest_file, "w", encoding="utf-8") as out:
+                        out.write(content)
                     print(f"[TEMPLATE] {dest_file}")
                 else:
                     shutil.copy2(src_file, dest_file)
                     print(f"[COPY] {dest_file}")
 
-    # Generate the project
-    def generate(self):
-        print(f"Generating project '{self.project_name}'...")
-        self.copy_and_render()
-        print(f"Project '{self.project_name}' created successfully at {self.output_dir}")
+
+    # ---------- render a feature adapter ----------
+    def render_feature_adapter(self, feature_name: str, adapter_dir: Path):
+        
+        # Copy and render all files from a feature adapter into the output_dir.
+        # adapter_dir = features/<feature>/adapters/<template>/files
+        
+        if not adapter_dir.exists():
+            print(f"[SKIP] Adapter for feature '{feature_name}' does not exist at {adapter_dir}")
+            return
+
+        # Feature files should go into src/project_name directory (same as base template)
+        project_dir = self.output_dir / "src" / self.project_name
+
+        for root, dirs, files in os.walk(adapter_dir):
+            rel_path = Path(root).relative_to(adapter_dir)
+            target_dir = project_dir / rel_path
+            target_dir.mkdir(parents=True, exist_ok=True)
+
+            for f in files:
+                src_file = Path(root) / f
+                dest_file = target_dir / f.replace(".j2", "")
+
+                if f.endswith(".j2"):
+                    # render with jinja2
+                    env = Environment(
+                        loader=FileSystemLoader(adapter_dir),
+                        keep_trailing_newline=True
+                    )
+                    template_path = str(rel_path / f).replace("\\", "/")
+                    template = env.get_template(template_path)
+                    content = template.render(project_name=self.project_name)
+                    with open(dest_file, "w", encoding="utf-8") as out:
+                        out.write(content)
+                    print(f"[FEATURE TEMPLATE] {feature_name}: {dest_file}")
+                else:
+                    shutil.copy2(src_file, dest_file)
+                    print(f"[FEATURE COPY] {feature_name}: {dest_file}")

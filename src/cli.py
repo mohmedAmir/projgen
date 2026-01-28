@@ -1,39 +1,47 @@
 import argparse
-import sys
-from src.engine.generator import ProjectGenerator, OPTIONAL_MODULES
+from pathlib import Path
+from src.engine.context import Context
+from src.engine.loader import load_plugins
+from src.engine.renderer import Renderer
 
 def main():
-    parser = argparse.ArgumentParser(description="projgen: Generate a Python project template")
-    parser.add_argument("template_type", type=str, help="Type of template (e.g., backend)")
-    parser.add_argument("project_name", type=str, help="The name of the project to generate")
-    parser.add_argument("--path", type=str, default=".", help="Directory where the project will be created")
+    parser = argparse.ArgumentParser(description="ProjGen CLI")
+    subparsers = parser.add_subparsers(dest="command", required=True)
 
-    # Optional modules flags
-    parser.add_argument("--auth", action="store_true", help="Include auth module")
-    parser.add_argument("--docker", action="store_true", help="Include docker module")
-    parser.add_argument("--ci", action="store_true", help="Include CI/CD module")
-    parser.add_argument("--logging", action="store_true", help="Include logging module")
+    new_parser = subparsers.add_parser("new", help="Create new project")
+    new_parser.add_argument("project_name", type=str)
+    new_parser.add_argument("--template", type=str, default="backend")
+    new_parser.add_argument("--features", type=str, nargs="+", default=[])
+    new_parser.add_argument("--path", type=str, default=".")
 
     args = parser.parse_args()
+    if args.command == "new":
+        output_dir = Path(args.path) / args.project_name
+        context = Context(args.project_name, args.template, output_dir, args.features)
 
-    options = [mod for mod in OPTIONAL_MODULES if getattr(args, mod)]
+        # Load plugins
+        features_root = Path(__file__).resolve().parent / "features"
+        plugins = load_plugins(features_root, args.features)
+        for p in plugins:
+            p.register(context)
 
-    try:
-        generator = ProjectGenerator(
-            project_name=args.project_name,
-            output_dir=args.path,
-            template_type=args.template_type,
-            options=options
-        )
-        generator.generate()
+        # Render base template
+        template_root = Path(__file__).resolve().parents[1] / "templates" / args.template
+        renderer = Renderer(template_root, output_dir, args.project_name)
+        renderer.render_template_dir(template_name=args.template)
 
-    # Handle errors gracefully
-    except FileNotFoundError as e:
-        print(f"Error: {e}", file=sys.stderr)
-        sys.exit(1)
-    except FileExistsError as e:
-        print(f"Error: {e}", file=sys.stderr)
-        sys.exit(1)
+        # Render feature adapters
+        for p in plugins:
+            adapter_dir = features_root / p.name / "adapters" / args.template / "files"
+            renderer.render_feature_adapter(p.name, adapter_dir)
+
+        # Apply plugin logic
+        for p in plugins:
+            p.apply(context)
+        for p in plugins:
+            p.after(context)
+
+        print(f"Project '{args.project_name}' generated successfully at {output_dir}")
 
 if __name__ == "__main__":
     main()

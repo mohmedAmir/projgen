@@ -1,70 +1,63 @@
 projgen/
- ├─ projgen/
- │   ├─ cli.py
- │   ├─ engine/
- │   │   ├─ generator.py
- │   │   ├─ context.py
- │   │   └─ renderer.py
- │   │
- │   ├─ templates/
- │   │   ├─ backend/
- │   │   │   ├─ template.yaml
- │   │   │   └─ files/
- │   │   │       ├─ src/
- │   │   │       │   └─ {{ project_name }}/
- │   │   │       │       ├─ __init__.py
- │   │   │       │       ├─ main.py.j2
- │   │   │       │       ├─ api/
- │   │   │       │       │   ├─ __init__.py
- │   │   │       │       │   ├─ router.py.j2
- │   │   │       │       │   └─ v1/
- │   │   │       │       │       ├─ __init__.py
- │   │   │       │       │       └─ endpoints/
- │   │   │       │       ├─ core/
- │   │   │       │       │   ├─ __init__.py
- │   │   │       │       │   ├─ config.py.j2
- │   │   │       │       │   └─ logging.py.j2
- │   │   │       │       ├─ models/
- │   │   │       │       ├─ schemas/
- │   │   │       │       ├─ services/
- │   │   │       │       └─ db/
- │   │   │       │           ├─ __init__.py
- │   │   │       │           └─ session.py.j2
- │   │   │       │
- │   │   │       ├─ tests/
- │   │   │       │   └─ test_health.py.j2
- │   │   │       │
- │   │   │       ├─ configs/
- │   │   │       │   ├─ settings.dev.yaml
- │   │   │       │   └─ settings.prod.yaml
- │   │   │       │
- │   │   │       ├─ optional/
- │   │   │       │   ├─ auth/
- │   │   │       │   │   ├─ dependencies.py.j2
- │   │   │       │   │   ├─ jwt.py.j2
- │   │   │       │   │   └─ routes.py.j2
- │   │   │       │   │
- │   │   │       │   ├─ logging/
- │   │   │       │   │   └─ logging.yaml
- │   │   │       │   │
- │   │   │       │   ├─ docker/
- │   │   │       │   │   ├─ Dockerfile
- │   │   │       │   │   └─ docker-compose.yml
- │   │   │       │   │
- │   │   │       │   └─ ci/
- │   │   │       │       └─ github-actions.yml
- │   │   │       │
- │   │   │       ├─ requirements.txt
- │   │   │       ├─ pyproject.toml
- │   │   │       ├─ .env.example
- │   │   │       └─ README.md.j2
- │   │   │
- │   │   ├─ frontend/
- │   │   ├─ fullstack/
- │   │   ├─ cli/
- │   │   └─ library/
- │   │
- │   └─ utils/
- │
- ├─ tests/
- └─ README.md
+├─ projgen/
+│   ├─ src/
+│   │  │
+│   │  ├─ cli.py
+│   │  │
+    │  ├─ engine/
+    │  │  ├─ generator.py        # orchestrator فقط
+    │  │  ├─ context.py          # الحقيقة المطلقة عن المشروع
+    │  │  ├─ renderer.py         # jinja + filesystem
+    │  │  ├─ plugin.py           # Plugin base class
+    │  │  └─ loader.py           # اكتشاف plugins
+    │  │
+    │  ├─ templates/
+    │  │  ├─ backend/
+    │  │  │  ├─ template.yaml
+    │  │  │  └─ base/            # الملفات الأساسية فقط
+    │  │  │     └─ files/
+    │  │  │
+    │  │  ├─ frontend/
+    │  │  │  ├─ template.yaml
+    │  │  │  └─ base/
+    │  │  │     └─ files/
+    │  │  │
+    │  │  └─ library/
+    │  │     ├─ template.yaml
+    │  │     └─ base/
+    │  │        └─ files/
+    │  │
+    │  ├─ features/              # هنا القوة الحقيقية
+    │  │  ├─ auth/
+    │  │  │  ├─ plugin.py
+    │  │  │  ├─ feature.yaml
+    │  │  │  └─ adapters/
+    │  │  │     ├─ backend/
+    │  │  │     │  └─ files/
+                |       └─ __init__.py
+                |
+    │  │  │     ├─ frontend/
+    │  │  │     │  └─ files/
+    │  │  │     └─ library/
+    │  │  │        └─ files/
+    │  │  │
+    │  │  ├─ docker/
+    │  │  │  ├─ plugin.py
+    │  │  │  ├─ feature.yaml
+    │  │  │  └─ adapters/
+    │  │  │     ├─ backend/
+    │  │  │     │  └─ files/
+    │  │  │     └─ frontend/
+    │  │  │        └─ files/
+    │  │  │
+    │  │  └─ ci/
+    │  │     ├─ plugin.py
+    │  │     ├─ feature.yaml
+    │  │     └─ adapters/
+    │  │        └─ backend/
+    │  │           └─ files/
+    │  │
+    │  └─ utils/
+    │
+    ├─ tests/
+    └─ README.md

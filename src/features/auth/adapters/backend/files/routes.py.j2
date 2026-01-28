@@ -1,0 +1,12 @@
+from fastapi import APIRouter, Depends, HTTPException
+from auth.jwt import create_access_token
+
+router = APIRouter()
+
+@router.post("/login")
+def login(username: str, password: str):
+    # TODO: replace with real authentication
+    if username != "admin" or password != "secret":
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    token = create_access_token({"sub": username})
+    return {"access_token": token, "token_type": "bearer"}
