@@ -1,0 +1,21 @@
+from pathlib import Path
+import yaml
+
+BASE_DIR = Path(__file__).resolve().parents[3]
+CONFIG_DIR = BASE_DIR / "configs"
+
+class Settings:
+    def __init__(self, env: str = "dev"):
+        config_file = CONFIG_DIR / f"settings.{env}.yaml"
+        if not config_file.exists():
+            raise FileNotFoundError(f"Config file not found: {config_file}")
+
+        with open(config_file, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f)
+
+        self.app = data["app"]
+        self.server = data["server"]
+        self.database = data["database"]
+        self.logging = data["logging"]
+
+settings = Settings()

@@ -1,0 +1,9 @@
+name: auth
+description: Authentication support
+templates:
+  - backend fastapi
+  - frontend
+  - cli
+  - database
+  - fullstack
+  - library

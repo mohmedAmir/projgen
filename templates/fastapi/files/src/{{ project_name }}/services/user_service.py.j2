@@ -1,0 +1,32 @@
+from sqlalchemy.orm import Session
+from models.user import User
+from typing import Optional
+
+
+class UserService:
+    """
+    Business logic related to users.
+    No HTTP, no FastAPI, no Depends.
+    """
+
+    def __init__(self, db: Session):
+        self.db = db
+
+    def get_by_email(self, email: str) -> Optional[User]:
+        return self.db.query(User).filter(User.email == email).first()
+
+    def create_user(self, email: str, hashed_password: str) -> User:
+        user = User(
+            email=email,
+            hashed_password=hashed_password,
+        )
+        self.db.add(user)
+        self.db.commit()
+        self.db.refresh(user)
+        return user
+
+    def deactivate_user(self, user: User) -> User:
+        user.is_active = False
+        self.db.commit()
+        self.db.refresh(user)
+        return user
